@@ -9,6 +9,7 @@
         .status-lunas { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
         .status-cicil { background-color: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
         .status-belum { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .admin-only { display: none; } /* Tersembunyi untuk umum */
     </style>
 </head>
 <body class="bg-slate-50 font-sans p-4 md:p-8 text-slate-800">
@@ -19,22 +20,22 @@
                 <div>
                     <h1 class="text-2xl font-bold text-slate-800">Kas Rohis Online 🌐</h1>
                     <div class="flex items-center gap-2 mt-1">
-                        <span id="adminBadge" class="hidden px-2 py-0.5 bg-blue-600 text-white text-[10px] font-bold rounded shadow-sm">MODE ADMIN AKTIF</span>
-                        <p id="dbStatus" class="text-amber-500 text-xs font-medium italic">Connecting...</p>
+                        <span id="adminBadge" class="hidden px-2 py-0.5 bg-blue-600 text-white text-[10px] font-bold rounded shadow-sm italic">SISTEM TERKUNCI (READ ONLY)</span>
+                        <p id="dbStatus" class="text-amber-500 text-xs font-medium italic">Menghubungkan...</p>
                     </div>
                 </div>
                 <div class="flex gap-2">
                     <button id="loginBtn" onclick="loginAdmin()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl font-semibold hover:bg-slate-200 transition-all text-sm">
                         Login Admin
                     </button>
-                    <button onclick="openModal()" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all shadow-md">
+                    <button id="btnInput" onclick="checkAdminBeforeOpen()" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all shadow-md">
                         + Input Bayar
                     </button>
                 </div>
             </div>
             
             <div class="mt-6 pt-6 border-t border-slate-100">
-                <label class="block text-xs font-bold text-slate-400 uppercase mb-2 tracking-widest">Pilih Nama Anggota</label>
+                <label class="block text-xs font-bold text-slate-400 uppercase mb-2 tracking-widest">Cek Nama Anggota</label>
                 <select id="selectAnggota" onchange="renderKas()" class="w-full md:w-1/2 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all"></select>
             </div>
         </header>
@@ -55,27 +56,30 @@
             </div>
         </div>
 
-        <footer class="mt-8 text-center text-slate-400 text-xs uppercase tracking-widest">
-            Developed by <span class="font-bold text-slate-600">SYAHRUL</span>
+        <footer class="mt-8 text-center text-slate-400 text-[10px] uppercase tracking-[0.2em]">
+            Developed by <span class="font-bold text-slate-600">SYAHRUL</span> | Jurusan TKJ
         </footer>
     </div>
 
     <div id="modalBayar" class="fixed inset-0 bg-slate-900/60 hidden backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div class="bg-white p-8 rounded-3xl w-full max-w-sm shadow-2xl">
-            <h2 class="text-xl font-bold mb-6">Input Pembayaran</h2>
+        <div class="bg-white p-8 rounded-3xl w-full max-w-sm shadow-2xl border-2 border-blue-100">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Input Data (Admin)</h2>
+                <span class="text-[10px] bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-bold">SYAHRUL</span>
+            </div>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-semibold mb-1">Pilih Bulan</label>
+                    <label class="block text-sm font-semibold mb-1 text-slate-600">Bulan Pembayaran</label>
                     <select id="inputBulan" class="w-full p-3 border rounded-xl bg-slate-50 outline-none"></select>
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold mb-1 text-slate-700">Nominal Uang (Rp)</label>
+                    <label class="block text-sm font-semibold mb-1 text-slate-600">Nominal (Rp)</label>
                     <input type="number" id="inputNominal" placeholder="Contoh: 10000" class="w-full p-3 border rounded-xl bg-slate-50 font-bold text-blue-600 outline-none">
                 </div>
             </div>
             <div class="flex gap-3 mt-8">
-                <button onclick="closeModal()" class="flex-1 py-3 text-slate-500 font-semibold hover:bg-slate-100 rounded-xl">Batal</button>
-                <button onclick="prosesBayar()" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-200">Simpan</button>
+                <button onclick="closeModal()" class="flex-1 py-3 text-slate-400 font-semibold hover:bg-slate-50 rounded-xl transition-all">Batal</button>
+                <button onclick="prosesBayar()" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700">SIMPAN DATA</button>
             </div>
         </div>
     </div>
@@ -112,38 +116,45 @@
         ].sort();
         const bulanList = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-        // Setup Dropdowns
         const selectA = document.getElementById('selectAnggota');
         daftarNama.forEach(nama => selectA.innerHTML += `<option value="${nama}">${nama.toUpperCase()}</option>`);
         const selectB = document.getElementById('inputBulan');
         bulanList.forEach((bulan, idx) => selectB.innerHTML += `<option value="${idx}">${bulan}</option>`);
 
-        // Load Data from Firebase
         onValue(kasRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 window.dbKas = data;
-                document.getElementById('dbStatus').innerText = "Cloud Online";
+                document.getElementById('dbStatus').innerText = "Online - Realtime Aktif";
                 document.getElementById('dbStatus').className = "text-green-500 text-xs font-medium italic";
             } else {
-                // Initial data structure if DB is empty
                 daftarNama.forEach(n => window.dbKas[n] = bulanList.map(b => ({ namaBulan: b, terbayar: 0 })));
                 set(kasRef, window.dbKas);
             }
             renderKas();
         });
 
-        // Admin Auth
+        // FUNGSI CEK ADMIN
         window.loginAdmin = function() {
-            const pw = prompt("Masukkan Password Admin:");
+            const pw = prompt("Masukkan Password Admin (Syahrul):");
             if (pw === "KAS ROHIS") {
                 isAdmin = true;
-                document.getElementById('adminBadge').classList.remove('hidden');
-                document.getElementById('loginBtn').innerText = "Admin: SYAHRUL";
-                alert("Halo Syahrul! Mode Admin aktif.");
+                document.getElementById('adminBadge').innerText = "MODE ADMIN AKTIF";
+                document.getElementById('adminBadge').classList.remove('hidden', 'bg-blue-600');
+                document.getElementById('adminBadge').classList.add('bg-green-600', 'block');
+                document.getElementById('loginBtn').innerText = "ADMIN: SYAHRUL";
+                alert("Akses Diterima! Silakan input data kas.");
             } else {
-                alert("Password Salah!");
+                alert("Akses Ditolak! Password salah.");
             }
+        };
+
+        window.checkAdminBeforeOpen = function() {
+            if (!isAdmin) {
+                alert("Maaf, menu ini hanya untuk Admin. Silakan Login Admin terlebih dahulu!");
+                return;
+            }
+            document.getElementById('modalBayar').classList.remove('hidden');
         };
 
         window.renderKas = function() {
@@ -154,9 +165,9 @@
 
             data.forEach(item => {
                 const sisa = 10000 - item.terbayar;
-                let status = "Belum Bayar", sClass = "status-belum";
-                if (item.terbayar >= 10000) { status = "Lunas", sClass = "status-lunas"; }
-                else if (item.terbayar > 0) { status = "Dicicil", sClass = "status-cicil"; }
+                let status = "BELUM BAYAR", sClass = "status-belum";
+                if (item.terbayar >= 10000) { status = "LUNAS", sClass = "status-lunas"; }
+                else if (item.terbayar > 0) { status = "DICICIL", sClass = "status-cicil"; }
 
                 tbody.innerHTML += `
                     <tr>
@@ -171,16 +182,13 @@
         };
 
         window.prosesBayar = function() {
-            if (!isAdmin) {
-                alert("Hanya SYAHRUL (Admin) yang bisa menginput data kas!");
-                return;
-            }
+            if (!isAdmin) return alert("ILEGAL AKSES: Hanya Admin yang diizinkan!");
 
             const nama = document.getElementById('selectAnggota').value;
             const idx = document.getElementById('inputBulan').value;
             const nominal = parseInt(document.getElementById('inputNominal').value);
 
-            if (!nominal || nominal <= 0) return alert("Masukkan nominal uang!");
+            if (!nominal || nominal <= 0) return alert("Masukkan nominal yang valid!");
 
             window.dbKas[nama][idx].terbayar += nominal;
             
@@ -188,11 +196,11 @@
                 .then(() => {
                     closeModal();
                     document.getElementById('inputNominal').value = '';
+                    alert("Data Berhasil Disimpan!");
                 })
-                .catch(e => alert("Gagal menyimpan: " + e.message));
+                .catch(e => alert("Error Database: " + e.message));
         };
 
-        window.openModal = () => document.getElementById('modalBayar').classList.remove('hidden');
         window.closeModal = () => document.getElementById('modalBayar').classList.add('hidden');
     </script>
 </body>
