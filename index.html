@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Kas Rohis - Pawelangit</title>
+    <title>Kas Rohis Online - Pawelangit</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .status-lunas { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
@@ -14,70 +14,86 @@
 <body class="bg-slate-50 font-sans p-4 md:p-8">
 
     <div class="max-w-6xl mx-auto">
-        <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 border border-slate-200">
-            <h1 class="text-2xl font-bold text-slate-800">Manajemen Kas Rohis</h1>
-            <p class="text-slate-500">Iuran: <span class="font-bold text-blue-600">Rp 10.000 / bulan</span></p>
-            
-            <div class="mt-6 flex flex-wrap gap-4">
-                <div class="flex-1 min-w-[200px]">
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Pilih Anggota</label>
-                    <select id="selectAnggota" onchange="renderKas()" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
-                        </select>
+        <header class="bg-white p-6 rounded-2xl shadow-sm mb-6 border border-slate-200">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-800">Kas Rohis Online 🌐</h1>
+                    <p id="dbStatus" class="text-amber-500 text-sm font-medium italic">Menghubungkan ke Cloud Firebase...</p>
                 </div>
-                <button onclick="openModal()" class="self-end px-6 py-2.5 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all shadow-md shadow-blue-100">
-                    + Input Pembayaran
+                <button onclick="openModal()" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all shadow-md">
+                    + Input Bayar
                 </button>
             </div>
-        </div>
+            
+            <div class="mt-6 pt-6 border-t border-slate-100">
+                <label class="block text-xs font-bold text-slate-400 uppercase mb-2 tracking-widest">Pilih Anggota Rohis</label>
+                <select id="selectAnggota" onchange="renderKas()" class="w-full md:w-1/2 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                    </select>
+            </div>
+        </header>
 
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
-                    <thead class="bg-slate-50 border-b border-slate-200">
+                    <thead class="bg-slate-50 border-b border-slate-200 uppercase text-[10px] tracking-widest text-slate-500">
                         <tr>
-                            <th class="p-4 text-slate-600 font-semibold">Bulan</th>
-                            <th class="p-4 text-slate-600 font-semibold text-right">Terbayar</th>
-                            <th class="p-4 text-slate-600 font-semibold text-right">Sisa Tagihan</th>
-                            <th class="p-4 text-slate-600 font-semibold text-center">Status</th>
+                            <th class="p-4">Bulan</th>
+                            <th class="p-4 text-right">Terbayar</th>
+                            <th class="p-4 text-right">Sisa Tagihan</th>
+                            <th class="p-4 text-center">Status</th>
                         </tr>
                     </thead>
-                    <tbody id="kasTableBody">
+                    <tbody id="kasTableBody" class="divide-y divide-slate-100">
                         </tbody>
                 </table>
             </div>
         </div>
 
-        <footer class="mt-8 text-center text-slate-400 text-sm">
-            &copy; 2026 Admin Rohis - Developed by Pawelangit
+        <footer class="mt-8 text-center text-slate-400 text-xs uppercase tracking-widest">
+            Developed by <span class="font-bold text-slate-600">Pawelangit (Arulmodss)</span>
         </footer>
     </div>
 
-    <div id="modalBayar" class="fixed inset-0 bg-slate-900/50 hidden backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div class="bg-white p-8 rounded-2xl w-full max-w-md shadow-2xl">
-            <h2 class="text-xl font-bold mb-6 text-slate-800">Form Pembayaran</h2>
-            
+    <div id="modalBayar" class="fixed inset-0 bg-slate-900/60 hidden backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-8 rounded-3xl w-full max-w-sm shadow-2xl">
+            <h2 class="text-xl font-bold mb-6">Input Pembayaran</h2>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Bulan</label>
-                    <select id="inputBulan" class="w-full p-2 border rounded-lg bg-slate-50">
-                        </select>
+                    <label class="block text-sm font-semibold mb-1">Pilih Bulan</label>
+                    <select id="inputBulan" class="w-full p-3 border rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-blue-500"></select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Nominal Bayar (Rp)</label>
-                    <input type="number" id="inputNominal" placeholder="Contoh: 5000" 
-                           class="w-full p-2 border rounded-lg bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none">
+                    <label class="block text-sm font-semibold mb-1">Nominal (Rp)</label>
+                    <input type="number" id="inputNominal" placeholder="Contoh: 5000" class="w-full p-3 border rounded-xl bg-slate-50 font-bold text-blue-600 outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
             </div>
-
-            <div class="flex justify-end gap-3 mt-8">
-                <button onclick="closeModal()" class="px-5 py-2 text-slate-500 hover:bg-slate-100 rounded-lg">Batal</button>
-                <button onclick="prosesBayar()" class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan Data</button>
+            <div class="flex gap-3 mt-8">
+                <button onclick="closeModal()" class="flex-1 py-3 text-slate-500 font-semibold hover:bg-slate-100 rounded-xl transition-all">Batal</button>
+                <button onclick="prosesBayar()" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all">Simpan</button>
             </div>
         </div>
     </div>
 
-    <script>
-        const targetPerBulan = 10000;
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // Firebase Config Milik Syahrul
+        const firebaseConfig = {
+            apiKey: "AIzaSyAqMfqjxoV7KUT8XAolVfKs3dEI0vtVxGQ",
+            authDomain: "kas-rohis.firebaseapp.com",
+            projectId: "kas-rohis",
+            storageBucket: "kas-rohis.firebasestorage.app",
+            messagingSenderId: "1055631031220",
+            appId: "1:1055631031220:web:4708fb2e47f5189c9d10e1",
+            measurementId: "G-287L0WH3DD",
+            databaseURL: "https://kas-rohis-default-rtdb.firebaseio.com" // Sesuaikan dengan URL Database kamu
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const kasRef = ref(db, 'pembayaran_kas');
+
         const daftarNama = [
             "anditenrilengka", "muhammad sa'ad hamzah", "nurul alifiyatul aswan", "naswa", "saskia", "syahrul",
             "evi agnesia", "melinda saputri", "andi syahrul yudiono", "Almira ramadhani", "reski sulistia",
@@ -85,84 +101,82 @@
             "andi fadhil rumpang", "muh. resky wijaya", "muh fikran", "muh fauzan hidayatullah",
             "nurul sabila ramadhani", "nur asmil hasanah", "febri aulya kasunaya", "muh. iqbal", "yuliana",
             "Muh ilham", "Aldi supriadi", "zahrah rahmadhani"
-        ];
+        ].sort();
         const bulanList = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-        // Inisialisasi Database (Storage sederhana)
-        let dbKas = {};
-        daftarNama.forEach(nama => {
-            dbKas[nama] = bulanList.map(bulan => ({ namaBulan: bulan, terbayar: 0 }));
+        window.dbKas = {};
+
+        // Inisialisasi Nama & Bulan di UI
+        const selectA = document.getElementById('selectAnggota');
+        daftarNama.forEach(nama => selectA.innerHTML += `<option value="${nama}">${nama.toUpperCase()}</option>`);
+        const selectB = document.getElementById('inputBulan');
+        bulanList.forEach((bulan, idx) => selectB.innerHTML += `<option value="${idx}">${bulan}</option>`);
+
+        // AMBIL DATA DARI CLOUD (REAL-TIME)
+        onValue(kasRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                window.dbKas = data;
+                document.getElementById('dbStatus').innerText = "Berhasil Terhubung (Cloud Online)";
+                document.getElementById('dbStatus').className = "text-green-500 text-sm font-medium italic";
+            } else {
+                // Jika database masih kosong, buat struktur awal
+                daftarNama.forEach(nama => {
+                    window.dbKas[nama] = bulanList.map(bulan => ({ namaBulan: bulan, terbayar: 0 }));
+                });
+                set(kasRef, window.dbKas);
+            }
+            renderKas();
         });
 
-        // Setup Dropdown Nama & Bulan
-        function setupApp() {
-            const selectA = document.getElementById('selectAnggota');
-            daftarNama.sort().forEach(nama => {
-                selectA.innerHTML += `<option value="${nama}">${nama.toUpperCase()}</option>`;
-            });
-
-            const selectB = document.getElementById('inputBulan');
-            bulanList.forEach((bulan, idx) => {
-                selectB.innerHTML += `<option value="${idx}">${bulan}</option>`;
-            });
-
-            renderKas();
-        }
-
-        function renderKas() {
-            const namaTerpilih = document.getElementById('selectAnggota').value;
-            const dataBulan = dbKas[namaTerpilih];
+        // RENDER TABEL
+        window.renderKas = function() {
+            const nama = document.getElementById('selectAnggota').value;
+            const data = window.dbKas[nama] || [];
             const tbody = document.getElementById('kasTableBody');
             tbody.innerHTML = '';
 
-            dataBulan.forEach(item => {
-                const sisa = targetPerBulan - item.terbayar;
-                let status = "Belum Bayar";
-                let sClass = "status-belum";
-
-                if (item.terbayar >= targetPerBulan) {
-                    status = "Lunas";
-                    sClass = "status-lunas";
-                } else if (item.terbayar > 0) {
-                    status = "Dicicil";
-                    sClass = "status-cicil";
-                }
+            data.forEach(item => {
+                const sisa = 10000 - item.terbayar;
+                let status = "Belum Bayar", sClass = "status-belum";
+                if (item.terbayar >= 10000) { status = "Lunas"; sClass = "status-lunas"; }
+                else if (item.terbayar > 0) { status = "Dicicil"; sClass = "status-cicil"; }
 
                 tbody.innerHTML += `
-                    <tr class="border-b border-slate-100 hover:bg-slate-50/50 transition-colors text-sm">
-                        <td class="p-4 font-medium text-slate-700">${item.namaBulan}</td>
-                        <td class="p-4 text-right text-green-600 font-semibold">Rp ${item.terbayar.toLocaleString()}</td>
-                        <td class="p-4 text-right text-red-500 font-semibold">Rp ${Math.max(0, sisa).toLocaleString()}</td>
+                    <tr class="hover:bg-slate-50/50 transition-all">
+                        <td class="p-4 font-semibold text-slate-700">${item.namaBulan}</td>
+                        <td class="p-4 text-right text-green-600 font-bold">Rp ${item.terbayar.toLocaleString()}</td>
+                        <td class="p-4 text-right text-red-500 font-bold">Rp ${Math.max(0, sisa).toLocaleString()}</td>
                         <td class="p-4 text-center">
-                            <span class="px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${sClass}">
+                            <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${sClass}">
                                 ${status}
                             </span>
                         </td>
-                    </tr>
-                `;
+                    </tr>`;
             });
-        }
+        };
 
-        function openModal() { document.getElementById('modalBayar').classList.remove('hidden'); }
-        function closeModal() { document.getElementById('modalBayar').classList.add('hidden'); }
-
-        function prosesBayar() {
+        // SIMPAN KE CLOUD
+        window.prosesBayar = function() {
             const nama = document.getElementById('selectAnggota').value;
-            const idxBulan = document.getElementById('inputBulan').value;
+            const idx = document.getElementById('inputBulan').value;
             const nominal = parseInt(document.getElementById('inputNominal').value);
 
-            if (isNaN(nominal) || nominal <= 0) {
-                alert("Masukkan nominal yang benar!");
-                return;
-            }
+            if (!nominal || nominal <= 0) return alert("Nominal tidak valid!");
 
-            dbKas[nama][idxBulan].terbayar += nominal;
-            renderKas();
-            closeModal();
-            document.getElementById('inputNominal').value = '';
-        }
+            window.dbKas[nama][idx].terbayar += nominal;
+            
+            // Simpan ke Firebase
+            set(kasRef, window.dbKas)
+                .then(() => {
+                    closeModal();
+                    document.getElementById('inputNominal').value = '';
+                })
+                .catch((error) => alert("Gagal Simpan: " + error.message));
+        };
 
-        setupApp();
+        window.openModal = () => document.getElementById('modalBayar').classList.remove('hidden');
+        window.closeModal = () => document.getElementById('modalBayar').classList.add('hidden');
     </script>
 </body>
 </html>
