@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kas Rohis Online - Pawelangit</title>
+    <title>Kas Rohis Online - SYAHRUL</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .status-lunas { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
@@ -11,24 +11,31 @@
         .status-belum { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
     </style>
 </head>
-<body class="bg-slate-50 font-sans p-4 md:p-8">
+<body class="bg-slate-50 font-sans p-4 md:p-8 text-slate-800">
 
     <div class="max-w-6xl mx-auto">
         <header class="bg-white p-6 rounded-2xl shadow-sm mb-6 border border-slate-200">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 class="text-2xl font-bold text-slate-800">Kas Rohis Online 🌐</h1>
-                    <p id="dbStatus" class="text-amber-500 text-sm font-medium italic">Menghubungkan ke Cloud Firebase...</p>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span id="adminBadge" class="hidden px-2 py-0.5 bg-blue-600 text-white text-[10px] font-bold rounded shadow-sm">MODE ADMIN AKTIF</span>
+                        <p id="dbStatus" class="text-amber-500 text-xs font-medium italic">Connecting...</p>
+                    </div>
                 </div>
-                <button onclick="openModal()" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all shadow-md">
-                    + Input Bayar
-                </button>
+                <div class="flex gap-2">
+                    <button id="loginBtn" onclick="loginAdmin()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl font-semibold hover:bg-slate-200 transition-all text-sm">
+                        Login Admin
+                    </button>
+                    <button onclick="openModal()" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all shadow-md">
+                        + Input Bayar
+                    </button>
+                </div>
             </div>
             
             <div class="mt-6 pt-6 border-t border-slate-100">
-                <label class="block text-xs font-bold text-slate-400 uppercase mb-2 tracking-widest">Pilih Anggota Rohis</label>
-                <select id="selectAnggota" onchange="renderKas()" class="w-full md:w-1/2 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                    </select>
+                <label class="block text-xs font-bold text-slate-400 uppercase mb-2 tracking-widest">Pilih Nama Anggota</label>
+                <select id="selectAnggota" onchange="renderKas()" class="w-full md:w-1/2 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all"></select>
             </div>
         </header>
 
@@ -43,14 +50,13 @@
                             <th class="p-4 text-center">Status</th>
                         </tr>
                     </thead>
-                    <tbody id="kasTableBody" class="divide-y divide-slate-100">
-                        </tbody>
+                    <tbody id="kasTableBody" class="divide-y divide-slate-100"></tbody>
                 </table>
             </div>
         </div>
 
         <footer class="mt-8 text-center text-slate-400 text-xs uppercase tracking-widest">
-            Developed by <span class="font-bold text-slate-600">Pawelangit (Arulmodss)</span>
+            Developed by <span class="font-bold text-slate-600">SYAHRUL</span>
         </footer>
     </div>
 
@@ -60,16 +66,16 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-semibold mb-1">Pilih Bulan</label>
-                    <select id="inputBulan" class="w-full p-3 border rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-blue-500"></select>
+                    <select id="inputBulan" class="w-full p-3 border rounded-xl bg-slate-50 outline-none"></select>
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold mb-1">Nominal (Rp)</label>
-                    <input type="number" id="inputNominal" placeholder="Contoh: 5000" class="w-full p-3 border rounded-xl bg-slate-50 font-bold text-blue-600 outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-sm font-semibold mb-1 text-slate-700">Nominal Uang (Rp)</label>
+                    <input type="number" id="inputNominal" placeholder="Contoh: 10000" class="w-full p-3 border rounded-xl bg-slate-50 font-bold text-blue-600 outline-none">
                 </div>
             </div>
             <div class="flex gap-3 mt-8">
-                <button onclick="closeModal()" class="flex-1 py-3 text-slate-500 font-semibold hover:bg-slate-100 rounded-xl transition-all">Batal</button>
-                <button onclick="prosesBayar()" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all">Simpan</button>
+                <button onclick="closeModal()" class="flex-1 py-3 text-slate-500 font-semibold hover:bg-slate-100 rounded-xl">Batal</button>
+                <button onclick="prosesBayar()" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-200">Simpan</button>
             </div>
         </div>
     </div>
@@ -78,7 +84,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // Firebase Config Milik Syahrul
         const firebaseConfig = {
             apiKey: "AIzaSyAqMfqjxoV7KUT8XAolVfKs3dEI0vtVxGQ",
             authDomain: "kas-rohis.firebaseapp.com",
@@ -87,12 +92,15 @@
             messagingSenderId: "1055631031220",
             appId: "1:1055631031220:web:4708fb2e47f5189c9d10e1",
             measurementId: "G-287L0WH3DD",
-            databaseURL: "https://kas-rohis-default-rtdb.firebaseio.com" // Sesuaikan dengan URL Database kamu
+            databaseURL: "https://kas-rohis-default-rtdb.asia-southeast1.firebasedatabase.app"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const kasRef = ref(db, 'pembayaran_kas');
+
+        let isAdmin = false;
+        window.dbKas = {};
 
         const daftarNama = [
             "anditenrilengka", "muhammad sa'ad hamzah", "nurul alifiyatul aswan", "naswa", "saskia", "syahrul",
@@ -104,32 +112,40 @@
         ].sort();
         const bulanList = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-        window.dbKas = {};
-
-        // Inisialisasi Nama & Bulan di UI
+        // Setup Dropdowns
         const selectA = document.getElementById('selectAnggota');
         daftarNama.forEach(nama => selectA.innerHTML += `<option value="${nama}">${nama.toUpperCase()}</option>`);
         const selectB = document.getElementById('inputBulan');
         bulanList.forEach((bulan, idx) => selectB.innerHTML += `<option value="${idx}">${bulan}</option>`);
 
-        // AMBIL DATA DARI CLOUD (REAL-TIME)
+        // Load Data from Firebase
         onValue(kasRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 window.dbKas = data;
-                document.getElementById('dbStatus').innerText = "Berhasil Terhubung (Cloud Online)";
-                document.getElementById('dbStatus').className = "text-green-500 text-sm font-medium italic";
+                document.getElementById('dbStatus').innerText = "Cloud Online";
+                document.getElementById('dbStatus').className = "text-green-500 text-xs font-medium italic";
             } else {
-                // Jika database masih kosong, buat struktur awal
-                daftarNama.forEach(nama => {
-                    window.dbKas[nama] = bulanList.map(bulan => ({ namaBulan: bulan, terbayar: 0 }));
-                });
+                // Initial data structure if DB is empty
+                daftarNama.forEach(n => window.dbKas[n] = bulanList.map(b => ({ namaBulan: b, terbayar: 0 })));
                 set(kasRef, window.dbKas);
             }
             renderKas();
         });
 
-        // RENDER TABEL
+        // Admin Auth
+        window.loginAdmin = function() {
+            const pw = prompt("Masukkan Password Admin:");
+            if (pw === "KAS ROHIS") {
+                isAdmin = true;
+                document.getElementById('adminBadge').classList.remove('hidden');
+                document.getElementById('loginBtn').innerText = "Admin: SYAHRUL";
+                alert("Halo Syahrul! Mode Admin aktif.");
+            } else {
+                alert("Password Salah!");
+            }
+        };
+
         window.renderKas = function() {
             const nama = document.getElementById('selectAnggota').value;
             const data = window.dbKas[nama] || [];
@@ -139,40 +155,41 @@
             data.forEach(item => {
                 const sisa = 10000 - item.terbayar;
                 let status = "Belum Bayar", sClass = "status-belum";
-                if (item.terbayar >= 10000) { status = "Lunas"; sClass = "status-lunas"; }
-                else if (item.terbayar > 0) { status = "Dicicil"; sClass = "status-cicil"; }
+                if (item.terbayar >= 10000) { status = "Lunas", sClass = "status-lunas"; }
+                else if (item.terbayar > 0) { status = "Dicicil", sClass = "status-cicil"; }
 
                 tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50/50 transition-all">
+                    <tr>
                         <td class="p-4 font-semibold text-slate-700">${item.namaBulan}</td>
-                        <td class="p-4 text-right text-green-600 font-bold">Rp ${item.terbayar.toLocaleString()}</td>
-                        <td class="p-4 text-right text-red-500 font-bold">Rp ${Math.max(0, sisa).toLocaleString()}</td>
+                        <td class="p-4 text-right text-emerald-600 font-bold">Rp ${item.terbayar.toLocaleString()}</td>
+                        <td class="p-4 text-right text-rose-500 font-bold">Rp ${Math.max(0, sisa).toLocaleString()}</td>
                         <td class="p-4 text-center">
-                            <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${sClass}">
-                                ${status}
-                            </span>
+                            <span class="px-3 py-1 rounded-lg text-[10px] font-black border ${sClass}">${status}</span>
                         </td>
                     </tr>`;
             });
         };
 
-        // SIMPAN KE CLOUD
         window.prosesBayar = function() {
+            if (!isAdmin) {
+                alert("Hanya SYAHRUL (Admin) yang bisa menginput data kas!");
+                return;
+            }
+
             const nama = document.getElementById('selectAnggota').value;
             const idx = document.getElementById('inputBulan').value;
             const nominal = parseInt(document.getElementById('inputNominal').value);
 
-            if (!nominal || nominal <= 0) return alert("Nominal tidak valid!");
+            if (!nominal || nominal <= 0) return alert("Masukkan nominal uang!");
 
             window.dbKas[nama][idx].terbayar += nominal;
             
-            // Simpan ke Firebase
             set(kasRef, window.dbKas)
                 .then(() => {
                     closeModal();
                     document.getElementById('inputNominal').value = '';
                 })
-                .catch((error) => alert("Gagal Simpan: " + error.message));
+                .catch(e => alert("Gagal menyimpan: " + e.message));
         };
 
         window.openModal = () => document.getElementById('modalBayar').classList.remove('hidden');
